@@ -5,7 +5,7 @@ import * as allure from "allure-js-commons";
 
 test.describe('Auth Flow: Login', () => {
   let response: APIResponse;
-  let adminToken: string;
+  let token: string;
 
 // test case 01: login invalid (username or password wrong)
     test('AUTH-01: Login Invalid', { tag: ['@regression'] }, async ({request}) => {
@@ -80,7 +80,7 @@ test.describe('Auth Flow: Login', () => {
     validateSchema(body.meta, 'meta');
     validateSchema(body.data, 'login');
 
-    adminToken = body.data.accessToken;
+    token = body.data.accessToken;
     })
   });
 
@@ -106,7 +106,7 @@ test.describe('Auth Flow: Login', () => {
     validateSchema(body.meta, 'meta');
     validateSchema(body.data, 'login');
 
-    adminToken = body.data.accessToken;
+    token = body.data.accessToken;
     })
   });
 });
