@@ -1,27 +1,157 @@
-name: Playwright Tests
+name: QA Regression Pipeline
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
+  # Nightly regression: setiap hari jam 00:00 WIB (17:00 UTC)
+  schedule:
+    - cron: '0 17 * * *'
+  # Manual trigger dari GitHub UI
+  workflow_dispatch:
+    inputs:
+      test_tag:
+        description: 'Tag to run (@smoke or @regression)'
+        required: false
+        default: '@regression'
+
+env:
+  BASE_URL: ${{ secrets.BASE_URL }}
+
 jobs:
-  test:
-    timeout-minutes: 60
+  # ═══════════════════════════════════════════
+  # Stage 1: Smoke Test — Quick health check
+  # ═══════════════════════════════════════════
+  smoke-test:
+    name: 🔥 Smoke Test
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Skip smoke gate on manual trigger (langsung ke regression)
+    if: github.event_name != 'workflow_dispatch'
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Smoke Tests
+        run: npm run test:smoke
+
+  # ═══════════════════════════════════════════
+  # Stage 2: Full Regression Test
+  # ═══════════════════════════════════════════
+  regression-test:
+    name: 🔄 Full Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: smoke-test
+    # Jalan setelah smoke pass, ATAU jika manual trigger, ATAU nightly schedule
+    if: |
+      always() &&
+      (needs.smoke-test.result == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Regression Tests
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            npx playwright test --grep "${{ github.event.inputs.test_tag }}"
+          else
+            npm run test:regression
+          fi
+
+      - name: Upload test results (Playwright)
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 14
+
+  # ═══════════════════════════════════════════
+  # Stage 3: Generate & Publish Allure Report
+  # ═══════════════════════════════════════════
+  allure-report:
+    name: 📊 Allure Report
+    runs-on: ubuntu-latest
+    needs: regression-test
+    if: always() && needs.regression-test.result != 'cancelled'
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      # Ambil history dari GitHub Pages supaya trend chart tetap ada
+      - name: Get previous Allure history
+        continue-on-error: true
+        run: |
+          git fetch origin gh-pages --depth=1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add gh-pages-branch origin/gh-pages
+            if [ -d "gh-pages-branch/history" ]; then
+              cp -r gh-pages-branch/history allure-results/history
+            fi
+            git worktree remove gh-pages-branch --force
+          fi
+
+      - name: Generate Allure Report
+        run: allure generate allure-results --clean -o allure-report
+
+      # Simpan history untuk run berikutnya
+      - name: Copy history for next run
+        run: |
+          mkdir -p allure-report/history
+          cp -r allure-report/history allure-report/history || true
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          publish_branch: gh-pages
+
