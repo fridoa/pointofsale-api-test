@@ -1,1 +1,1 @@
-{"total":1,"items":[{"uid":"54f079f735a311144fcc675a44808877","name":"api/auth/auth-flow.spec.ts","statistic":{"failed":0,"broken":0,"skipped":0,"passed":4,"unknown":0,"total":4}}]}
+{"total":2,"items":[{"uid":"54f079f735a311144fcc675a44808877","name":"api/auth/auth-flow.spec.ts","statistic":{"failed":0,"broken":0,"skipped":0,"passed":4,"unknown":0,"total":4}},{"uid":"973f6657f67907bc18ec0d12c288f830","name":"api/auth/token.spec.ts","statistic":{"failed":0,"broken":0,"skipped":0,"passed":4,"unknown":0,"total":4}}]}
