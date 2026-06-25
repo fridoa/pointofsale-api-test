@@ -1,0 +1,5 @@
+"BROKEN","EPIC","FAILED","FEATURE","PASSED","SKIPPED","STORY","UNKNOWN"
+"0","Auth","0","Login","1","0","AUTH-03: Admin Login Successfully","0"
+"0","Auth","0","Login","1","0","AUTH-01: Login Invalid","0"
+"0","Auth","0","Login","1","0","AUTH-04: Cashier Login Successfully","0"
+"0","Auth","0","Login","1","0","AUTH-02: Login with Empty Credential","0"
