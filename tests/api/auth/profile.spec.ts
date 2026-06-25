@@ -23,7 +23,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-09: Get profile valid', { tag: ['@regression'] }, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-09: Get profile valid")
         allure.label("severity", "critical")
         await test.step('1. Send GET /auth/profile request', async () => {
@@ -46,7 +46,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-10: Get profile without token', {tag: ['@regression']}, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-10: Get profile without token")
         allure.label("severity", "normal")
         await test.step('1. Send GET /auth/profile request', async () => {
@@ -64,7 +64,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-11: Update profile valid', {tag: ['@regression']}, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-11: Update profile valid")
         allure.label("severity", "normal")
 
@@ -94,7 +94,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-12: Update profile invalid', {tag: ['@regression']}, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-12: Update profile invalid")
         allure.label("severity", "normal")
 
@@ -125,7 +125,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-13: Change password - old password wrong', {tag: ['@regression']}, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-13: Change password - old password wrong")
         allure.label("severity", "normal")
 
@@ -157,7 +157,7 @@ test.describe('Auth flow: Profile', () => {
 
     test('AUTH-14: Change password - confirmation not match', {tag: ['@regression']}, async ({request}) => {
         allure.epic("Auth")
-        allure.feature("Auth Flow")
+        allure.feature("Profile")
         allure.story("AUTH-14: Change password - confirmation not match")
         allure.label("severity", "normal")
 
