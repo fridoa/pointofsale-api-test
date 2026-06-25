@@ -60,6 +60,15 @@ const SCHEMAS: Record<string, SchemaField[]> = {
     { field: 'status', type: 'number', required: true },
     { field: 'message', type: 'string', required: true },
   ],
+
+  // Response errors (validasi dinamis)
+  errors: [
+    { field: 'email', type: 'string', required: false },
+    { field: 'confirmPassword', type: 'string', required: false },
+    { field: 'username', type: 'string', required: false },
+    { field: 'name', type: 'string', required: false },
+    { field: 'password', type: 'string', required: false },
+  ],
 };
 
 export function validateSchema(data: any, schemaName: string) {
