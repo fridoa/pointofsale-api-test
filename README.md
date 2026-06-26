@@ -6,7 +6,6 @@ Proyek ini adalah test automation suite untuk **Backend API Mobile POS & Invento
 Hasil eksekusi automation testing terbaru (berjalan otomatis via CI/CD setiap ada perubahan di branch `main`) dapat dilihat secara online pada link berikut:
 
 > 👉 **[Buka Allure Test Report](https://fridoa.github.io/pointofsale-api-test/)** 
-*(Note: Ganti URL di atas dengan link GitHub Pages repositori kamu, contoh: https://username.github.io/repository-name/)*
 
 ---
 
