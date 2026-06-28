@@ -6,6 +6,8 @@ dotenv.config();
 
 export default defineConfig({
   testDir: "./tests",
+  globalSetup: "./tests/global-setup.ts",
+  globalTeardown: "./tests/global-teardown.ts",
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,
