@@ -69,6 +69,13 @@ const SCHEMAS: Record<string, SchemaField[]> = {
     { field: 'name', type: 'string', required: false },
     { field: 'password', type: 'string', required: false },
   ],
+
+  // Pagination response
+  pagination: [
+    { field: 'total', type: 'number', required: true },
+    { field: 'totalPages', type: 'number', required: true },
+    { field: 'currentPage', type: 'number', required: true },
+  ],
 };
 
 export function validateSchema(data: any, schemaName: string) {
