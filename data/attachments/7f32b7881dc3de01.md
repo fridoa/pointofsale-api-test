@@ -1,0 +1,146 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api/auth/forgot-password.spec.ts >> Auth flow: Forgot & Reset Password >> AUTH-15: Forgot password with valid email
+- Location: tests/api/auth/forgot-password.spec.ts:8:9
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: 429
+```
+
+# Test source
+
+```ts
+  1   | import test, { APIResponse, expect } from "@playwright/test";
+  2   | import * as allure from "allure-js-commons";
+  3   | 
+  4   | 
+  5   | test.describe('Auth flow: Forgot & Reset Password', () => {
+  6   |     let response: APIResponse
+  7   | 
+  8   |     test('AUTH-15: Forgot password with valid email', {tag: ['@regression']}, async ({request}) => {
+  9   |         allure.epic("Auth");
+  10  |         allure.feature("Forgot Password");
+  11  |         allure.story("AUTH-15: Forgot password - email valid");
+  12  |         allure.label("severity", "critical");
+  13  | 
+  14  |         await test.step('1. Send POST /auth/forgot-password', async () => {
+  15  |             response = await request.post('/auth/forgot-password', {
+  16  |                 data: { email: 'admin@test.com' } 
+  17  |             });
+  18  |         });
+  19  | 
+  20  |         await test.step('2. Verify status 200', async () => {
+> 21  |             expect(response.status()).toBe(200);
+      |                                       ^ Error: expect(received).toBe(expected) // Object.is equality
+  22  |         });
+  23  | 
+  24  |         await test.step('3. Verify security message', async () => {
+  25  |             const body = await response.json();
+  26  |             expect(body.meta.message).toContain('instruksi pemulihan kata sandi');
+  27  |         });
+  28  |     })
+  29  | 
+  30  |     test('AUTH-16: Forgot password with email empty', {tag: ['@regression']}, async ({request}) => {
+  31  |         allure.epic("Auth");
+  32  |         allure.feature("Forgot Password");
+  33  |         allure.story("AUTH-16: Forgot password - email empty");
+  34  |         allure.label("severity", "normal");
+  35  | 
+  36  |         await test.step('1. Send POST /auth/forgot-password', async () => {
+  37  |             response = await request.post('/auth/forgot-password', {
+  38  |                 data: { email: '' } 
+  39  |             });
+  40  |         });
+  41  | 
+  42  |         await test.step('2. Verify status 400', async () => {
+  43  |             expect(response.status()).toBe(400);
+  44  |         });
+  45  | 
+  46  |         await test.step('3. Verify error message', async () => {
+  47  |             const body = await response.json();
+  48  |             expect(body.errors.email).toBe('Email is required');
+  49  |         });
+  50  |     })
+  51  | 
+  52  |     test('AUTH-17: Forgot password with email invalid format', {tag: ['@regression']}, async ({request}) => {
+  53  |         allure.epic("Auth");
+  54  |         allure.feature("Forgot Password");
+  55  |         allure.story("AUTH-17: Forgot password - email invalid format");
+  56  |         allure.label("severity", "normal");
+  57  | 
+  58  |         await test.step('1. Send POST /auth/forgot-password', async () => {
+  59  |             response = await request.post('/auth/forgot-password', {
+  60  |                 data: { email: 'invalid-email.com' } 
+  61  |             });
+  62  |         });
+  63  | 
+  64  |         await test.step('2. Verify status 400', async () => {
+  65  |             expect(response.status()).toBe(400);
+  66  |         });
+  67  | 
+  68  |         await test.step('3. Verify error message', async () => {
+  69  |             const body = await response.json();
+  70  |             expect(body.errors.email).toBe('Invalid email format');
+  71  |         });
+  72  |     })
+  73  |     
+  74  |     test('AUTH-18: Forgot password with email not registered', {tag: ['@regression']}, async ({request}) => {
+  75  |         allure.epic("Auth");
+  76  |         allure.feature("Forgot Password");
+  77  |         allure.story("AUTH-18: Forgot password - email not registered");
+  78  |         allure.label("severity", "normal");
+  79  | 
+  80  |         await test.step('1. Send POST with unregistered email', async () => {
+  81  |             response = await request.post('/auth/forgot-password', {
+  82  |                 data: { email: `notexist_${Date.now()}@example.com` }
+  83  |             });
+  84  |         });
+  85  | 
+  86  |         await test.step('2. Verify return 200', async () => {
+  87  |             expect(response.status()).toBe(200);
+  88  |         });
+  89  | 
+  90  |         await test.step('3. Verify return same message with email valid', async () => {
+  91  |             const body = await response.json();
+  92  |             expect(body.meta.message).toContain('instruksi pemulihan kata sandi');
+  93  |         });
+  94  |     })
+  95  |     
+  96  |     test('AUTH-19: Reset password - token invalid', {tag: ['@regression']}, async ({request}) => {
+  97  |         allure.epic('Auth')
+  98  |         allure.feature('Forgot Password')
+  99  |         allure.story('AUTH-19: Reset password - token invalid')
+  100 |         allure.label('severity', 'normal')
+  101 | 
+  102 |         await test.step('1. Send POST /auth/reset-password', async () => {
+  103 |             response = await request.post('/auth/reset-password', {
+  104 |                 data: {
+  105 |                     token: 'ini-token-asal-asalan-yang-tidak-valid',
+  106 |                     newPassword: 'NewPassword123',
+  107 |                     confirmPassword: 'NewPassword123'
+  108 |                 }
+  109 |             });
+  110 |         });
+  111 | 
+  112 |         await test.step('2. Verify status 400', async () => {
+  113 |             expect(response.status()).toBe(400);
+  114 |         });
+  115 | 
+  116 |         await test.step('3. Verify error message', async () => {
+  117 |             const body = await response.json();
+  118 |             expect(body.message).toContain('tidak valid atau telah kedaluwarsa');
+  119 |         });
+  120 |     })
+  121 | 
+```
