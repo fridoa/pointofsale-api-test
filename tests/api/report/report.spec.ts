@@ -135,11 +135,12 @@ test.describe.serial('Report Flow', () => {
     allure.story('RPT-02: Date Filter');
     allure.label('severity', 'normal');
 
-    // Create a date range for today
-    const today = new Date().toISOString().split('T')[0];
+    // Create a date range that safely spans across timezone boundaries (yesterday to tomorrow)
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
     await test.step('1. Send GET /report/sales-summary with startDate and endDate', async () => {
-      response = await request.get(`/report/sales-summary?startDate=${today}&endDate=${today}`, {
+      response = await request.get(`/report/sales-summary?startDate=${yesterday}&endDate=${tomorrow}`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       });
     });
@@ -280,10 +281,12 @@ test.describe.serial('Report Flow', () => {
     allure.story('RPT-08: Date Filter');
     allure.label('severity', 'normal');
 
-    const today = new Date().toISOString().split('T')[0];
+    // Use yesterday to tomorrow to avoid timezone boundary issues
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
     await test.step('1. Send GET /report/top-products with date filter', async () => {
-      response = await request.get(`/report/top-products?startDate=${today}&endDate=${today}`, {
+      response = await request.get(`/report/top-products?startDate=${yesterday}&endDate=${tomorrow}`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       });
     });
