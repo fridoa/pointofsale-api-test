@@ -77,6 +77,19 @@ const SCHEMAS: Record<string, SchemaField[]> = {
     { field: 'margin', type: 'number', required: true },
   ],
 
+  // GET /notification -> body.data elements
+  notification: [
+    { field: '_id', type: 'string', required: true },
+    { field: 'title', type: 'string', required: true },
+    { field: 'message', type: 'string', required: true },
+    { field: 'isRead', type: 'boolean', required: true },
+  ],
+
+  // GET /notification/unread-count -> body.data
+  unreadCount: [
+    { field: 'count', type: 'number', required: true },
+  ],
+
   // Response meta (semua endpoint)
   meta: [
     { field: 'status', type: 'number', required: true },
