@@ -55,6 +55,28 @@ const SCHEMAS: Record<string, SchemaField[]> = {
     { field: 'items', type: 'array', required: true },
   ],
 
+  // GET /report/sales-summary -> body.data
+  salesSummary: [
+    { field: 'totalRevenue', type: 'number', required: true },
+    { field: 'totalCost', type: 'number', required: true },
+    { field: 'netProfit', type: 'number', required: true },
+    { field: 'margin', type: 'number', required: true },
+    { field: 'revenueTrend', type: 'number', required: true },
+    { field: 'totalTransactions', type: 'number', required: true },
+    { field: 'dailyStats', type: 'array', required: true },
+  ],
+
+  // GET /report/top-products -> body.data elements
+  topProduct: [
+    { field: '_id', type: 'string', required: true },
+    { field: 'name', type: 'string', required: true },
+    { field: 'totalQty', type: 'number', required: true },
+    { field: 'totalRevenue', type: 'number', required: true },
+    { field: 'totalCost', type: 'number', required: true },
+    { field: 'profit', type: 'number', required: true },
+    { field: 'margin', type: 'number', required: true },
+  ],
+
   // Response meta (semua endpoint)
   meta: [
     { field: 'status', type: 'number', required: true },
